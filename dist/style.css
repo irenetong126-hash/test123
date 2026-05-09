@@ -1,0 +1,38 @@
+/* 修改原本的 .menu-summary，改用 class 控制 */
+.menu-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 40px;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--text-dark);
+    text-decoration: none; /* 防止出現底線 */
+}
+
+.menu-summary:hover {
+    background-color: #f8f8f8;
+}
+
+/* 箭頭基礎樣式 */
+.arrow {
+    display: inline-block; /* 必須加上這行，旋轉才會生效 */
+    font-size: 10px;
+    transition: transform 0.3s ease;
+}
+
+/* 移除原本的 details[open]，改由 JS 內聯樣式或 class 控制 */
+/* 注意：因為您的 JS 是直接修改 style.transform，所以這裡不需要寫旋轉的 CSS */
+
+.sub-menu {
+    background-color: #fafafa;
+    display: none; /* 初始隱藏 */
+}
+
+.sub-menu a {
+    display: block;
+    padding: 10px 40px 10px 60px !important; /* 增加左側縮排 */
+    font-size: 14px !important;
+    color: #666 !important;
+    text-decoration: none;
+}

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Untitled</title>
+    <link rel="stylesheet" href="./style.css">
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ももコ・もも購</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root { --bg: #ffffff; --text-dark: #3e2723; --line: #f2f2f2; --accent: #8d6e63; --danger: #d32f2f; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: var(--bg); color: var(--text-dark); letter-spacing: 0.05em; line-height: 1.6; }
+
+        /* 導覽列 */
+        .top-navbar { position: fixed; top: 0; left: 0; width: 100%; height: 70px; background: #ffffff; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 1001; border-bottom: 1px solid var(--line); }
+        .nav-left { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .logo-display { height: 45px; width: auto; border-radius: 5px; }
+        .admin-change-logo { background: #3e2723; color: white; font-size: 11px; padding: 4px 8px; border-radius: 4px; display: none; cursor: pointer; margin-left: 10px; }
+        .nav-right { display: flex; align-items: center; gap: 20px; font-size: 18px; }
+        .hamburger-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-dark); }
+        .cart-btn-wrapper { position: relative; cursor: pointer; }
+        .cart-count { position: absolute; top: -8px; right: -10px; background: var(--danger); color: white; font-size: 10px; padding: 2px 5px; border-radius: 50%; font-weight: 700; }
+
+        /* 側邊選單與購物車 */
+        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.2); z-index: 1999; display: none; backdrop-filter: blur(2px); }
+        .side-menu { height: 100%; width: 0; position: fixed; z-index: 2000; top: 0; right: 0; background-color: #ffffff; transition: 0.3s ease; padding-top: 80px; box-shadow: -5px 0 15px rgba(0,0,0,0.05); overflow-x: hidden; }
+        .side-menu a { padding: 16px 40px; text-decoration: none; font-size: 15px; color: var(--text-dark); display: block; cursor: pointer; }
+        .cart-sidebar { height: 100%; width: 0; position: fixed; z-index: 2100; top: 0; right: 0; background-color: #fff; transition: 0.3s ease; display: flex; flex-direction: column; overflow: hidden; box-shadow: -5px 0 20px rgba(0,0,0,0.1); }
+        .cart-header { padding: 20px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
+        .cart-body { flex: 1; overflow-y: auto; padding: 10px; }
+        .cart-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f9f9f9; align-items: center; }
+        .cart-item img { width: 50px; height: 65px; object-fit: cover; border-radius: 4px; }
+
+        /* 商品展示區 */
+        .main-content { padding-top: 70px; min-height: 100vh; }
+        .view-section { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 30px; margin-top: 30px; }
+        .product-card { background: white; text-align: left; cursor: pointer; }
+        .img-container { width: 100%; aspect-ratio: 3 / 4; overflow: hidden; border-radius: 8px; background: #f9f9f9; position: relative; }
+        .product-card img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* 商品詳情 */
+        .detail-view { display: none; padding-top: 40px; }
+        .detail-container { display: flex; flex-wrap: wrap; gap: 50px; text-align: left; }
+        .detail-left { flex: 1.2; min-width: 300px; }
+        .main-img-holder { width: 100%; aspect-ratio: 3 / 4; overflow: hidden; border-radius: 12px; margin-bottom: 15px; background: #f9f9f9; }
+        .main-img-holder img { width: 100%; height: 100%; object-fit: cover; }
+        .thumb-list { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
+        .thumb-item { width: 70px; height: 90px; flex-shrink: 0; cursor: pointer; border-radius: 4px; border: 2px solid transparent; opacity: 0.6; }
+        .thumb-item img { width: 100%; height: 100%; object-fit: cover; }
+        .thumb-item.active { border-color: var(--text-dark); opacity: 1; }
+
+        /* 結帳明細 (防卡字設計) */
+        #checkout-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 4000; overflow-y: auto; padding: 40px 20px; font-size: 14px; }
+        .checkout-container { max-width: 500px; margin: 0 auto; background: #fff; padding: 30px; border: 1px solid #eee; }
+        .checkout-title { text-align: center; margin-bottom: 25px; font-size: 22px; font-weight: 700; }
+        .receipt-item { display: flex; gap: 15px; margin-bottom: 15px; border-bottom: 1px dashed #f0f0f0; padding-bottom: 15px; }
+        .receipt-item img { width: 70px; height: 90px; object-fit: cover; border-radius: 4px; }
+        .receipt-total-bar { font-size: 18px; font-weight: 700; text-align: right; margin: 20px 0; padding-top: 10px; border-top: 2px solid var(--text-dark); }
+        .buyer-info-section { margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--line); }
+        .info-row { display: flex; margin-bottom: 12px; align-items: flex-start; }
+        .info-label { width: 100px; color: #888; font-weight: 500; padding-top: 2px; }
+        .info-input { border: none; border-bottom: 1px solid #eee; width: 100%; outline: none; padding: 4px 0; font-size: 14px; color: var(--text-dark); font-family: inherit; }
+        .export-text { display: none; width: 100%; padding: 4px 0; font-size: 14px; color: var(--text-dark); line-height: 1.4; word-break: break-all; }
+
+        /* 彈窗與按鈕 */
+        .btn-primary { background: var(--text-dark); color: white; padding: 12px 24px; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; width: 100%; }
+        .btn-secondary { background: var(--text-dark); color: white; padding: 12px 24px; border: 1px solid var(--text-dark); border-radius: 6px; font-weight: 700; cursor: pointer; opacity: 0.8; }
+        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 500px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; margin-bottom: 5px; font-weight: 700; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
+    </style>
+</head>
+<body>
+
+    <header class="top-navbar">
+        <div class="nav-left" onclick="showSection('home')">
+            <img id="main-logo" src="logo.png" class="logo-display" alt="Logo">
+            <span>ももコ・もも購</span>
+            <div id="change-logo-btn" class="admin-change-logo" onclick="changeLogoUrl(event)">更換 Logo</div>
+        </div>
+        <div class="nav-right">
+            <div class="cart-btn-wrapper" onclick="toggleCart(true)">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="cart-count" id="cart-badge">0</span>
+            </div>
+            <button class="hamburger-btn" onclick="toggleNav(true)"><i class="fa-solid fa-bars"></i></button>
+        </div>
+    </header>
+
+    <!-- 編輯/新增商品 Modal -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom:20px;">商品設定</h3>
+            <input type="hidden" id="edit-id">
+            <div class="form-group"><label>圖片網址 (多張請用逗號隔開)</label><textarea id="form-img" rows="3"></textarea></div>
+            <div class="form-group"><label>商品名稱</label><input type="text" id="form-name"></div>
+            <div class="form-group"><label>價格</label><input type="text" id="form-price"></div>
+            <div class="form-group"><label>顏色 (用逗號隔開)</label><input type="text" id="form-colors"></div>
+            <div class="form-group"><label>尺寸 (用逗號隔開)</label><input type="text" id="form-sizes"></div>
+            <div class="form-group"><label>描述</label><textarea id="form-desc" rows="3"></textarea></div>
+            <div style="text-align:right;">
+                <button onclick="closeModal()" class="btn-secondary" style="margin-right:10px;">取消</button>
+                <button onclick="saveProduct()" class="btn-primary" style="width:auto;">儲存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 結帳明細 -->
+    <div id="checkout-overlay">
+        <div class="checkout-container" id="receipt-capture">
+            <div class="checkout-title">結帳明細</div>
+            <div id="checkout-items-list"></div>
+            <div class="receipt-total-bar"><span>總金額 </span><span id="checkout-final-total">NT$ 0</span></div>
+            <div class="buyer-info-section">
+                <div style="font-weight: 700; margin-bottom: 15px; font-size: 16px;">購買人資訊</div>
+                <div class="info-row"><span class="info-label">姓名</span><input type="text" id="buyer-name" class="info-input" placeholder="請填寫"><span id="text-name" class="export-text"></span></div>
+                <div class="info-row"><span class="info-label">電話</span><input type="tel" id="buyer-phone" class="info-input" placeholder="請填寫"><span id="text-phone" class="export-text"></span></div>
+                <div class="info-row"><span class="info-label">IG or Line</span><input type="text" id="buyer-id" class="info-input" placeholder="請填寫"><span id="text-id" class="export-text"></span></div>
+            </div>
+        </div>
+        <div style="max-width:500px; margin: 25px auto; display:flex; flex-direction:column; gap:10px;">
+            <button class="btn-primary" onclick="exportToPng()">確認資訊並輸出 PNG</button>
+            <button class="btn-secondary" onclick="closeCheckout()">返回修改</button>
+        </div>
+    </div>
+
+    <!-- 購物車側欄 -->
+    <div id="cartSidebar" class="cart-sidebar">
+        <div class="cart-header"><span>購物清單</span><i class="fa-solid fa-xmark" onclick="toggleCart(false)" style="cursor:pointer;"></i></div>
+        <div id="cart-body" class="cart-body"></div>
+        <div style="padding: 20px; border-top: 1px solid var(--line);">
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:700;"><span>總計</span><span id="cart-total">NT$ 0</span></div>
+            <button class="btn-primary" onclick="openCheckout()">前往結帳</button>
+        </div>
+    </div>
+
+    <div id="overlay" class="menu-overlay" onclick="closeAll()"></div>
+
+    <!-- 側邊選單 -->
+ <nav id="mySidenav" class="side-menu">
+    <a onclick="showSection('home'); toggleNav(false);">首頁</a>
+    
+    <!-- 摺疊式 🇯🇵 選物選單 -->
+<!-- 🇯🇵選物區塊 -->
+    <div class="menu-group">
+        <!-- 點擊此處：觸發「大分類」邏輯 -->
+        <a onclick="showSection('shop', '🇯🇵選物'); toggleSubMenu();" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+            🇯🇵 選物 <span id="menu-arrow" style="transition: 0.3s;">▼</span>
+        </a>
+        
+        <!-- 子分類：點擊此處則精確篩選 -->
+        <div id="sub-menu-items" style="display: none; background-color: #fcfcfc;">
+            <a onclick="showSection('shop', '🇯🇵選物-衣物'); toggleNav(false);" style="padding-left: 60px; font-size: 15px; color: #666;">衣物</a>
+            <a onclick="showSection('shop', '🇯🇵選物-飾品'); toggleNav(false);" style="padding-left: 60px; font-size: 15px; color: #666;">飾品</a>
+            <a onclick="showSection('shop', '🇯🇵選物-小物'); toggleNav(false);" style="padding-left: 60px; font-size: 15px; color: #666;">小物</a>
+        </div>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 10px 40px;">
+    
+    <a onclick="showSection('shop', '二手衣'); toggleNav(false);">ももコ‧二手衣</a>
+    <a onclick="showSection('shop', '勾來勾去'); toggleNav(false);">ももコ‧勾來勾去</a>
+    
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 10px 40px;">
+    
+    <a onclick="showSection('how-to-buy'); toggleNav(false);">購買方法</a>
+    <a onclick="showSection('notice'); toggleNav(false);">注意事項</a>
+      <a id="admin-btn" onclick="adminAction()" style="font-size: 11px; margin-top: 50px; color: #bbb;">管理員登入</a>
+</nav>
+
+    <main class="main-content">
+        <section id="view-home" class="view-section" style="text-align: center;">
+            <img id="hero-logo" src="logo.png" style="width:140px; margin-bottom:20px; border-radius:10px;">
+            <h1>ももコ・もも購</h1>
+            <p>太多的東西・有時選物</p>
+        </section>
+
+        <section id="view-shop" class="view-section" style="display: none;">
+            <h2 id="current-cat" style="text-align: center; margin-bottom: 20px;">所有商品</h2>
+            <div class="product-grid" id="product-list">
+                <div id="admin-add" style="display:none; border:2px dashed #ddd; border-radius:8px; aspect-ratio:3/4; align-items:center; justify-content:center; cursor:pointer;" onclick="openModal()"><i class="fa-solid fa-plus"></i></div>
+            </div>
+        </section>
+
+        <section id="view-detail" class="view-section detail-view"></section>
+      <!-- 購買方法頁面 -->
+<!-- 購買方法頁面 -->
+<section id="view-how-to-buy" class="view-section" style="display: none;">
+    <h2 style="text-align: center; margin-bottom: 20px;">購買方法</h2>
+    <div style="max-width: 600px; margin: 0 auto; line-height: 2;">
+        <p>1. 挑選您喜愛的商品並加入購物車。</p>
+        <p>2. 進入購物車點選「前往結帳」。</p>
+        <p>3. 填寫您的聯絡資訊（姓名、電話、社群 ID）。</p>
+        <p>4. 點擊「輸出 PNG」儲存您的訂單明細圖。</p>
+        <p>5. 將該圖片私訊傳送至官方 IG 或 Line 即可完成預購。</p>
+        
+        <!-- 社群圖標區塊 -->
+        <div style="display: flex; justify-content: center; gap: 30px; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;">
+            <!-- Instagram -->
+            <a href="https://www.instagram.com/momo.oko._?igsh=aGlhM2NocHBwMTAy&utm_source=qr" target="_blank" style="text-decoration: none; color: #555; text-align: center;">
+                <svg width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.917 3.917 0 0 0-1.417.923A3.927 3.927 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.916 3.916 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.926 3.926 0 0 0-.923-1.417A3.911 3.911 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0h.003zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599.28.28.453.546.598.92.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.47 2.47 0 0 1-.599.919c-.28.28-.546.453-.92.598-.282.11-.705.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.478 2.478 0 0 1-.92-.598 2.48 2.48 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233 0-2.136.008-2.388.046-3.231.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92.28-.28.546-.453.92-.598.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045v.002zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92zm-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217zm0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334z"/>
+                </svg>
+                <div style="font-size: 10px; margin-top: 5px;">Instagram</div>
+            </a>
+            <!-- Line -->
+            <a href="https://lin.ee/Ne0Seeu" target="_blank" style="text-decoration: none; color: #555; text-align: center;">
+                <svg width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M15 8c0-3.308-3.14-6-7-6S1 4.692 1 8c0 2.964 2.533 5.42 6 5.92V16l3.333-2.333C13.567 12.964 15 10.667 15 8z"/>
+                </svg>
+                <div style="font-size: 10px; margin-top: 5px;">Line</div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- 注意事項頁面 -->
+<!-- 注意事項頁面 -->
+<section id="view-notice" class="view-section" style="display: none;">
+    <h2 style="text-align: center; margin-bottom: 25px;">注意事項</h2>
+    <div style="max-width: 600px; margin: 0 auto;">
+        
+        <!-- 分類 1 -->
+        <div style="margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+            <h3 style="font-size: 1.1rem; color: #333; margin-bottom: 10px;">🇯🇵 有關日本選物下單</h3>
+            <ul style="padding-left: 20px; line-height: 1.8; color: #666;">
+                <li>收單後，商品約需等候7−20個工作天以上</li>
+                <li>代購商品不適用於七日鑑賞期，尺寸不合/色差/線頭等個人因素和小瑕疵恕無提供退換</li>
+                <li>不定期會有🇯🇵連線</li>
+            </ul>
+        </div>
+
+        <!-- 分類 2 -->
+        <div style="margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+            <h3 style="font-size: 1.1rem; color: #333; margin-bottom: 10px;">🧶 有關鉤織小物</h3>
+            <ul style="padding-left: 20px; line-height: 1.8; color: #666;">
+                <li>商品皆為純手工製作！不會每一個都100%一樣呦</li>
+                <li>皆會有藏線頭或是縫合等等手作痕跡！</li>
+                <li>由於是接單後製作，約需等7-15個工作天以上。</li>
+            </ul>
+        </div>
+
+        <!-- 分類 3 -->
+        <div style="margin-bottom: 30px; padding-bottom: 15px;">
+            <h3 style="font-size: 1.1rem; color: #333; margin-bottom: 10px;">👕 有關 second-hand clothes</h3>
+            <ul style="padding-left: 20px; line-height: 1.8; color: #666;">
+                <li>衣物會有些微使用痕跡，完美主義者請先深呼吸再下單</li>
+                <li>照片已盡量接近實物，但因光線／螢幕不同，可能會有些許色差</li>
+                <li>商品售出不做退換貨!下單前請確認清楚!</li>
+            </ul>
+        </div>
+        
+    </div>
+</section>
+    </main>
+
+    <script>
+        let isAdmin = false; 
+        let currentCategory = ""; 
+        let cart = JSON.parse(localStorage.getItem('momoko_cart') || '[]');
+
+        function toggleNav(o) { document.getElementById("mySidenav").style.width = o ? "300px" : "0"; document.getElementById("overlay").style.display = o ? "block" : "none"; }
+        function toggleCart(o) { document.getElementById("cartSidebar").style.width = o ? "350px" : "0"; document.getElementById("overlay").style.display = o ? "block" : "none"; if(o) renderCart(); }
+        function closeAll() { toggleNav(false); toggleCart(false); closeCheckout(); }
+
+        // 管理員功能
+        function adminAction() {
+            if (!isAdmin) {
+                if(prompt("密碼：") === "1206") {
+                    isAdmin = true;
+                    document.getElementById('admin-btn').innerText = "退出管理員";
+                    document.getElementById('change-logo-btn').style.display = "inline-block";
+                    renderProducts();
+                }
+            } else {
+                isAdmin = false;
+                document.getElementById('admin-btn').innerText = "管理員登入";
+                document.getElementById('change-logo-btn').style.display = "none";
+                renderProducts();
+            }
+            toggleNav(false);
+        }
+
+        function changeLogoUrl(e) {
+            e.stopPropagation();
+            const newUrl = prompt("輸入 Logo 網址：");
+            if(newUrl) {
+                document.getElementById('main-logo').src = newUrl;
+                document.getElementById('hero-logo').src = newUrl;
+                localStorage.setItem('momoko_logo', newUrl);
+            }
+        }
+
+        // 商品渲染與管理
+        function renderProducts() {
+            const list = document.getElementById('product-list');
+            list.querySelectorAll('.product-card').forEach(c => c.remove());
+            const products = JSON.parse(localStorage.getItem('momoko_products') || '[]');
+            products.filter(p => p.cat === currentCategory).forEach(p => {
+                const firstImg = p.img.split(',')[0].trim();
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.onclick = () => showDetail(p.id);
+                card.innerHTML = `<div class="img-container"><img src="${firstImg}">${isAdmin ? `<div style="position:absolute; top:5px; right:5px; display:flex; gap:5px;"><button onclick="event.stopPropagation(); openModal(${p.id})" style="font-size:10px; background:#8d6e63; color:white; border:none; padding:2px 5px; border-radius:3px;">編輯</button><button onclick="event.stopPropagation(); deleteProduct(${p.id})" style="font-size:10px; background:red; color:white; border:none; padding:2px 5px; border-radius:3px;">刪除</button></div>` : ''}</div><div style="padding:10px 0;"><div>${p.name}</div><div style="font-weight:700;">NT$ ${p.price}</div></div>`;
+                list.appendChild(card);
+            });
+            document.getElementById('admin-add').style.display = isAdmin ? "flex" : "none";
+        }
+
+        function saveProduct() {
+            const id = document.getElementById('edit-id').value;
+            let products = JSON.parse(localStorage.getItem('momoko_products') || '[]');
+            const data = { id: id ? parseInt(id) : Date.now(), cat: currentCategory, img: document.getElementById('form-img').value, name: document.getElementById('form-name').value, price: document.getElementById('form-price').value, colors: document.getElementById('form-colors').value, sizes: document.getElementById('form-sizes').value, desc: document.getElementById('form-desc').value };
+            if (id) { const idx = products.findIndex(p => p.id == id); products[idx] = data; } else { products.push(data); }
+            localStorage.setItem('momoko_products', JSON.stringify(products)); closeModal(); renderProducts();
+        }
+
+        function deleteProduct(id) { if(confirm("確定刪除？")) { let ps = JSON.parse(localStorage.getItem('momoko_products')).filter(p => p.id !== id); localStorage.setItem('momoko_products', JSON.stringify(ps)); renderProducts(); } }
+        function openModal(id = null) {
+            document.getElementById('productModal').style.display = "flex";
+            if (id) {
+                const p = JSON.parse(localStorage.getItem('momoko_products')).find(item => item.id === id);
+                document.getElementById('edit-id').value = p.id; document.getElementById('form-img').value = p.img;
+                document.getElementById('form-name').value = p.name; document.getElementById('form-price').value = p.price;
+                document.getElementById('form-colors').value = p.colors || ""; document.getElementById('form-sizes').value = p.sizes || ""; document.getElementById('form-desc').value = p.desc || "";
+            } else { document.querySelectorAll('.modal-content input, .modal-content textarea').forEach(el => el.value = ""); }
+        }
+        function closeModal() { document.getElementById('productModal').style.display = "none"; }
+
+        // 商品詳情
+        function showDetail(id) {
+            const p = JSON.parse(localStorage.getItem('momoko_products')).find(item => item.id === id);
+            document.getElementById('view-shop').style.display = 'none';
+            document.getElementById('view-home').style.display = 'none';
+            const detailSec = document.getElementById('view-detail');
+            detailSec.style.display = 'block';
+            const imgs = p.img.split(',').map(s => s.trim());
+            const thumbHtml = imgs.map((url, index) => `<div class="thumb-item ${index===0?'active':''}" onclick="switchMainImg('${url}', this)"><img src="${url}"></div>`).join('');
+            detailSec.innerHTML = `
+                <div onclick="showSection('shop', currentCategory)" style="cursor:pointer; margin-bottom:20px;"><i class="fa-solid fa-arrow-left"></i> 返回</div>
+                <div class="detail-container">
+                    <div class="detail-left"><div class="main-img-holder"><img id="main-detail-img" src="${imgs[0]}"></div><div class="thumb-list">${thumbHtml}</div></div>
+                    <div class="detail-right">
+                        <h2>${p.name}</h2><div style="font-size:22px; font-weight:700; margin:15px 0;">NT$ ${p.price}</div>
+                        ${p.colors ? `<label style="font-size:13px; font-weight:700;">顏色</label><select id="sel-color" style="width:100%; padding:10px; margin:5px 0 15px;">${p.colors.split(',').map(c => `<option>${c.trim()}</option>`).join('')}</select>` : ''}
+                        ${p.sizes ? `<label style="font-size:13px; font-weight:700;">尺寸</label><select id="sel-size" style="width:100%; padding:10px; margin:5px 0 15px;">${p.sizes.split(',').map(s => `<option>${s.trim()}</option>`).join('')}</select>` : ''}
+                        <div style="margin-bottom:20px;">數量：<input type="number" id="qty-val" value="1" min="1" style="width:60px; padding:5px;"></div>
+                        <button class="btn-primary" onclick="addToCart(${p.id})">加入購物車</button>
+                        <p style="margin-top:25px; color:#666; white-space:pre-line; font-size:14px;">${p.desc || ''}</p>
+                    </div>
+                </div>
+            `;
+            window.scrollTo(0,0);
+        }
+
+        function switchMainImg(url, el) {
+            document.getElementById('main-detail-img').src = url;
+            document.querySelectorAll('.thumb-item').forEach(item => item.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        // 購物車與結帳 (CORS + 防卡字修正)
+        function addToCart(pid) {
+            const p = JSON.parse(localStorage.getItem('momoko_products')).find(i => i.id === pid);
+            cart.push({ cartId: Date.now(), name: p.name, price: parseInt(p.price), img: p.img.split(',')[0].trim(), color: document.getElementById('sel-color')?.value || '', size: document.getElementById('sel-size')?.value || '', qty: parseInt(document.getElementById('qty-val').value) });
+            localStorage.setItem('momoko_cart', JSON.stringify(cart));
+            updateBadge(); toggleCart(true);
+        }
+
+        function renderCart() {
+            const body = document.getElementById('cart-body'); body.innerHTML = ''; let total = 0;
+            cart.forEach(item => { total += item.price * item.qty; body.innerHTML += `<div class="cart-item"><img src="${item.img}"><div style="flex:1; font-size:13px;"><div style="font-weight:700;">${item.name}</div><div style="color:#888;">${item.color} ${item.size} / ${item.qty}件</div><div style="font-weight:700;">NT$ ${item.price * item.qty}</div></div><i class="fa-solid fa-trash-can" onclick="removeCart(${item.cartId})" style="cursor:pointer; color:#ccc;"></i></div>`; });
+            document.getElementById('cart-total').innerText = `NT$ ${total}`;
+        }
+
+        function openCheckout() {
+            if(cart.length === 0) return alert("購物車目前沒有商品喔！");
+            document.getElementById('checkout-overlay').style.display = "block";
+            const list = document.getElementById('checkout-items-list'); list.innerHTML = ''; let total = 0;
+            cart.forEach(item => {
+                total += item.price * item.qty;
+                // CORS 修正：加上時間戳並確保標籤屬性
+                const safeImg = item.img + (item.img.includes('?') ? '&' : '?') + 't=' + Date.now();
+                list.innerHTML += `<div class="receipt-item"><img src="${safeImg}" crossorigin="anonymous"><div style="flex:1;"><div style="font-weight:700;">${item.name}</div><div style="color:#888; font-size:12px;">規格：${item.color || '-'} / ${item.size || '-'}</div><div style="font-size:12px;">數量：${item.qty}</div><div style="text-align:right; font-weight:700;">NT$ ${item.price * item.qty}</div></div></div>`;
+            });
+            document.getElementById('checkout-final-total').innerText = `NT$ ${total}`;
+            toggleCart(false);
+        }
+
+        function exportToPng() {
+            const nv = document.getElementById('buyer-name').value.trim();
+            const pv = document.getElementById('buyer-phone').value.trim();
+            const iv = document.getElementById('buyer-id').value.trim();
+            if(!nv || !pv || !iv) return alert("請填寫資訊");
+
+            // 切換為文字顯示以防卡字
+            document.getElementById('text-name').innerText = nv; document.getElementById('text-phone').innerText = pv; document.getElementById('text-id').innerText = iv;
+            const ins = document.querySelectorAll('.info-input'); const txs = document.querySelectorAll('.export-text');
+            ins.forEach(e => e.style.display = 'none'); txs.forEach(e => e.style.display = 'block');
+
+            html2canvas(document.getElementById('receipt-capture'), { useCORS: true, scale: 3 }).then(canvas => {
+                const link = document.createElement('a'); link.download = `Order_${nv}.png`; link.href = canvas.toDataURL(); link.click();
+                ins.forEach(e => e.style.display = 'block'); txs.forEach(e => e.style.display = 'none');
+            });
+        }
+
+        function closeCheckout() { document.getElementById('checkout-overlay').style.display = "none"; }
+        function updateBadge() { document.getElementById('cart-badge').innerText = cart.length; }
+        function removeCart(cid) { cart = cart.filter(i => i.cartId !== cid); localStorage.setItem('momoko_cart', JSON.stringify(cart)); updateBadge(); renderCart(); }
+        function showSection(s, c="") { 
+            document.getElementById('view-home').style.display = s==='home'?'block':'none'; 
+            document.getElementById('view-shop').style.display = s==='shop'?'block':'none'; 
+            document.getElementById('view-detail').style.display='none'; 
+            if(s==='shop'){currentCategory=c; document.getElementById('current-cat').innerText=c; renderProducts();} 
+        }
+
+        window.onload = function() {
+            const l = localStorage.getItem('momoko_logo'); if(l){document.getElementById('main-logo').src=l; document.getElementById('hero-logo').src=l;}
+            updateBadge();
+        };
+    </script>
+</body>
+</html>
+    <script  src="./script.js"></script>
+
+  </body>
+  
+</html>

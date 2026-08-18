@@ -1212,17 +1212,21 @@ const prepChecklist = [{
   category: "訂位・預約",
   urgent: true,
   items: [{
-    text: "Sabataro（9/3早餐）線上預約",
-    note: "熱門時段常提前1–2個月被訂完，最優先處理"
+    text: "Sabataro（9/3早餐 11:30）線上預約",
+    note: "釜飯",
+    mapUrl: "https://www.google.com/maps/search/?api=1&query=Sabataro+%E3%81%95%E3%81%B0%E3%81%9F%E3%82%8D%E3%81%86+%E7%A6%8F%E5%B2%A1%E5%B8%82%E4%B8%AD%E5%A4%AE%E5%8C%BA%E8%B5%A4%E5%9D%82"
   }, {
-    text: "炉端ノいとおかし（8/29早餐）線上預約",
-    note: "完全預約制，需付訂金"
+    text: "炉端ノいとおかし（8/29早餐 13:00）線上預約",
+    note: "烤魚定食",
+    mapUrl: "https://www.google.com/maps/search/?api=1&query=%E7%82%89%E7%AB%AF%E3%83%8E%E3%81%84%E3%81%A8%E3%81%8A%E3%81%8B%E3%81%97+%E7%A6%8F%E5%B2%A1%E5%B8%82%E4%B8%AD%E5%A4%AE%E5%8C%BA%E5%85%AD%E6%9C%AC%E6%9D%BE"
   }, {
-    text: "由布院之森／ゆふ 特急劃位",
-    note: "「由布院之森」購票不能網路訂，需臨櫃或旅行社；一般「ゆふ」號則較彈性"
+    text: "MATOH【マトウ】剪髮燙髮（8/29下午）",
+    note: "藥院",
+    mapUrl: "https://www.google.com/maps/search/?api=1&query=MATOH+%E3%83%9E%E3%83%88%E3%82%A6+%E8%96%AC%E9%99%A2"
   }, {
-    text: "JR九州鐵路周遊券（北部九州版）購買",
-    note: "建議3日券涵蓋8/30–9/1，9/4另購博多→熊本車票"
+    text: "KKday糸島一日遊（9/2 08:20集合／08:30出發）",
+    note: "博多站周邊飯店集合上車，實際集合點以KKday訂購憑證為準",
+    mapUrl: "https://www.google.com/maps/search/?api=1&query=%E5%8D%9A%E5%A4%9A%E7%AB%99+%E7%A6%8F%E5%B2%A1"
   }]
 }, {
   category: "交通確認",
@@ -1230,36 +1234,18 @@ const prepChecklist = [{
   items: [{
     text: "熊本地震後續交通狀況",
     note: "出發前務必上JR九州官網／推特確認博多⇄熊本路段最新運行狀況"
-  }, {
-    text: "8/26 熊本機場→博多交通方式",
-    note: "機場巴士+新幹線 或 巴士直達，二擇一即可"
-  }, {
-    text: "9/5 回程時間壓縮",
-    note: "JX847為11:55起飛，上午行程需精簡，抓09:00前離開熊本站"
   }]
 }, {
   category: "證件・金錢",
   urgent: false,
   items: [{
-    text: "護照效期確認（6個月以上）"
+    text: "保險"
   }, {
-    text: "JR Pass兌換需出示護照"
+    text: "eSIM"
   }, {
-    text: "日幣現金與信用卡"
-  }, {
-    text: "eSIM或Wi-Fi機租借"
-  }]
-}, {
-  category: "行李與其他",
-  urgent: false,
-  items: [{
-    text: "界 別府為溫泉旅館，確認晚餐時段（17:30或19:30二部制需提前預約）"
-  }, {
-    text: "換洗衣物依天數＋溫泉旅館一泊備品需求打包"
-  }, {
-    text: "行動電源、轉接頭"
-  }, {
-    text: "常備藥品"
+    text: "Visit Japan Web",
+    linkUrl: "https://www.vjw.digital.go.jp/",
+    linkLabel: "前往填寫"
   }]
 }];
 
@@ -1846,7 +1832,27 @@ function PrepChecklist() {
       className: "prep-text-block"
     }, /*#__PURE__*/React.createElement("span", {
       className: "prep-text"
-    }, item.text), item.note && /*#__PURE__*/React.createElement("span", {
+    }, item.text, item.mapUrl && /*#__PURE__*/React.createElement("a", {
+      className: "tl-map-link",
+      href: item.mapUrl,
+      target: "_blank",
+      rel: "noopener noreferrer",
+      "aria-label": "在Google地圖開啟",
+      onClick: e => e.stopPropagation()
+    }, /*#__PURE__*/React.createElement(MapIcon, {
+      className: "tl-map-icon",
+      strokeWidth: 1.8
+    })), item.linkUrl && /*#__PURE__*/React.createElement("a", {
+      className: "tl-map-link",
+      href: item.linkUrl,
+      target: "_blank",
+      rel: "noopener noreferrer",
+      "aria-label": item.linkLabel || "前往連結",
+      onClick: e => e.stopPropagation()
+    }, /*#__PURE__*/React.createElement(ExternalLink, {
+      className: "tl-map-icon",
+      strokeWidth: 1.8
+    }))), item.note && /*#__PURE__*/React.createElement("span", {
       className: "prep-note"
     }, item.note), item.appUrl && /*#__PURE__*/React.createElement("a", {
       className: "prep-app-link",
@@ -1982,6 +1988,28 @@ function PrepChecklist() {
           opacity: 0.7;
         }
         .prep-app-link .mini-icon {
+          flex-shrink: 0;
+        }
+        .mini-icon {
+          width: 12px;
+          height: 12px;
+        }
+        .tl-map-link {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          margin-left: 6px;
+          vertical-align: middle;
+          text-decoration: none;
+          transition: opacity 0.15s ease;
+        }
+        .tl-map-link:hover {
+          opacity: 0.7;
+        }
+        .tl-map-icon {
+          width: 14px;
+          height: 14px;
+          color: #a83c32;
           flex-shrink: 0;
         }
       `));
